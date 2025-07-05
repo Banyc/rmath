@@ -2,10 +2,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 use num_traits::{One, Pow, Zero};
 
-use crate::{
-    disjoint_type::AsInner,
-    property::{IsNumType, IsOrd},
-};
+use crate::property::{IsNumType, IsOrd};
 
 pub fn cast<A, B>(a: impl AsRef<[A]>) -> Vec<B>
 where
@@ -36,15 +33,13 @@ where
         cum
     })
 }
-pub fn min<UpperType>(vector: impl AsRef<[UpperType::Inner]>) -> UpperType::Inner
+pub fn min<T>(vector: impl AsRef<[T]>) -> T
 where
-    UpperType: AsInner + IsOrd,
-    UpperType::Inner: PartialOrd + Copy,
+    T: PartialOrd + IsOrd + Copy,
 {
     let mut curr_min = None;
     for item in vector.as_ref() {
-        let item_: UpperType = (*item).into();
-        let true = item_.is_ord() else {
+        let true = item.is_ord() else {
             // continue;
             return *item;
         };
@@ -58,15 +53,13 @@ where
     }
     *curr_min.unwrap()
 }
-pub fn max<UpperType>(vector: impl AsRef<[UpperType::Inner]>) -> UpperType::Inner
+pub fn max<T>(vector: impl AsRef<[T]>) -> T
 where
-    UpperType: AsInner + IsOrd,
-    UpperType::Inner: PartialOrd + Copy,
+    T: PartialOrd + IsOrd + Copy,
 {
     let mut curr_max = None;
     for item in vector.as_ref() {
-        let item_: UpperType = (*item).into();
-        let true = item_.is_ord() else {
+        let true = item.is_ord() else {
             // continue;
             return *item;
         };
@@ -207,10 +200,7 @@ fn wrapping_incr(curr: usize, end: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        disjoint_type::{Float, Integer},
-        vector::{SeqParams, seq},
-    };
+    use crate::vector::{SeqParams, seq};
 
     use super::*;
 
@@ -234,7 +224,7 @@ mod tests {
             ),
             &[1, 4, 3, 16, 5, 36, 7, 64, 9, 100]
         );
-        assert_eq!(min::<Integer<i32>>(a), 1);
+        assert_eq!(min(a), 1);
     }
 
     #[test]
@@ -249,7 +239,7 @@ mod tests {
         let y: &[f32] = &[1., 1.414214, 1.732051, 2., 2.236068, 2.44949];
         let d = &sub(sqrt, y);
         let d = &abs(d);
-        let max = max::<Float<f32>>(d);
+        let max = max(d);
         dbg!(max);
         assert!(max < 0.001);
     }
@@ -257,10 +247,10 @@ mod tests {
     #[test]
     fn not_finite() {
         let x: &[f32] = &[1., f32::NAN];
-        assert!(min::<Float<f32>>(x).is_nan());
+        assert!(min(x).is_nan());
         let x: &[f32] = &[1., -f32::INFINITY];
-        assert_eq!(min::<Float<f32>>(x), -f32::INFINITY);
+        assert_eq!(min(x), -f32::INFINITY);
         let x: &[f32] = &[1., f32::INFINITY];
-        assert_eq!(max::<Float<f32>>(x), f32::INFINITY);
+        assert_eq!(max(x), f32::INFINITY);
     }
 }

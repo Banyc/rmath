@@ -1,5 +1,3 @@
-use crate::disjoint_type::{Float, Integer};
-
 macro_rules! mass_impl {
     (
         impl $Trait: ident for { $( $Type: ty ),* }
@@ -40,22 +38,6 @@ mass_impl!(
 pub trait IsOrd: Sized {
     fn is_ord(&self) -> bool;
 }
-impl<F> IsOrd for Float<F>
-where
-    F: num_traits::Float,
-{
-    fn is_ord(&self) -> bool {
-        !self.0.is_nan()
-    }
-}
-impl<T> IsOrd for Integer<T>
-where
-    T: num_traits::PrimInt,
-{
-    fn is_ord(&self) -> bool {
-        true
-    }
-}
 mass_impl!(
     impl IsOrd for { u8, i8, u16, i16, u32, i32, u128, i128, usize, isize } {
         fn is_ord(&self) -> bool {
@@ -70,24 +52,3 @@ mass_impl!(
         }
     }
 );
-
-#[allow(dead_code)]
-pub trait IsFinite: Sized {
-    fn is_finite(&self) -> bool;
-}
-impl<F> IsFinite for Float<F>
-where
-    F: num_traits::Float,
-{
-    fn is_finite(&self) -> bool {
-        self.0.is_finite()
-    }
-}
-impl<T> IsFinite for Integer<T>
-where
-    T: num_traits::PrimInt,
-{
-    fn is_finite(&self) -> bool {
-        true
-    }
-}
