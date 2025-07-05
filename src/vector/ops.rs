@@ -2,17 +2,14 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 use num_traits::{One, Pow, Zero};
 
-use crate::property::{IsNumType, IsOrd};
+use crate::property::IsOrd;
 
 pub fn cast<A, B>(a: impl AsRef<[A]>) -> Vec<B>
 where
-    A: Copy,
-    B: TryFrom<A>,
+    A: Copy + num_traits::AsPrimitive<B>,
+    B: Copy + 'static,
 {
-    a.as_ref()
-        .iter()
-        .map(|a| (*a).try_into().unwrap_or_else(|_| panic!()))
-        .collect()
+    a.as_ref().iter().map(|a| (*a).as_()).collect()
 }
 
 pub fn sum<T>(vector: impl AsRef<[T]>) -> T
@@ -95,21 +92,53 @@ where
 }
 pub fn sort<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
-    T: IsOrd + IsNumType + Copy + PartialOrd,
+    T: IsOrd + Copy + PartialOrd,
 {
     let vector = vector.as_ref();
     let mut out = vec![];
-    if T::is_float() {
+    if T::always_ord() {
+        out = vector.to_vec();
+    } else {
         for item in vector {
             if item.is_ord() {
                 out.push(*item);
             }
         }
-    } else {
-        out = vector.to_vec();
     }
     out.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
     out
+}
+pub fn mean<T>(vector: impl AsRef<[T]>) -> T
+where
+    T: num_traits::Float + num_traits::FromPrimitive,
+{
+    let vector = vector.as_ref();
+    assert!(!vector.is_empty());
+    let mut partial_mean = T::zero();
+    let len = vector.len();
+    for item in vector {
+        let a = item.div(T::from_usize(len).unwrap());
+        partial_mean = partial_mean.add(a);
+    }
+    partial_mean
+}
+pub fn var<T>(vector: impl AsRef<[T]>) -> T
+where
+    T: num_traits::Float + num_traits::FromPrimitive,
+{
+    let vector = vector.as_ref();
+    if vector.len() == 1 {
+        return T::nan();
+    }
+    let mut partial_var = T::zero();
+    let len = vector.len();
+    let mean = mean(vector);
+    for item in vector {
+        let a = item.sub(mean).powi(2);
+        let a = a.div(T::from_usize(len - 1).unwrap());
+        partial_var = partial_var.add(a);
+    }
+    partial_var
 }
 
 pub fn add<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T>
@@ -245,6 +274,18 @@ mod tests {
     }
 
     #[test]
+    fn test_mean() {
+        let x = &seq(&SeqParams {
+            start: 1,
+            end: 6,
+            step: 1,
+        });
+        let x = &cast::<_, f32>(x);
+        let mean = mean(x);
+        assert_eq!(mean, 3.5);
+    }
+
+    #[test]
     fn not_finite() {
         let x: &[f32] = &[1., f32::NAN];
         assert!(min(x).is_nan());
@@ -252,5 +293,7 @@ mod tests {
         assert_eq!(min(x), -f32::INFINITY);
         let x: &[f32] = &[1., f32::INFINITY];
         assert_eq!(max(x), f32::INFINITY);
+        let x: &[f32] = &[1., f32::INFINITY, f32::INFINITY];
+        assert_eq!(sort(x), &[1., f32::INFINITY, f32::INFINITY]);
     }
 }
