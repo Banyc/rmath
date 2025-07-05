@@ -34,41 +34,33 @@ pub fn min<T>(vector: impl AsRef<[T]>) -> T
 where
     T: PartialOrd + IsOrd + Copy,
 {
-    let mut curr_min = None;
-    for item in vector.as_ref() {
-        let true = item.is_ord() else {
-            // continue;
-            return *item;
-        };
-        let Some(prev_curr_min) = curr_min else {
-            curr_min = Some(item);
-            continue;
-        };
-        if item < prev_curr_min {
-            curr_min = Some(item);
-        }
-    }
-    *curr_min.unwrap()
+    find_ord_one_by(vector, |a, b| a < b)
 }
 pub fn max<T>(vector: impl AsRef<[T]>) -> T
 where
     T: PartialOrd + IsOrd + Copy,
 {
-    let mut curr_max = None;
+    find_ord_one_by(vector, |a, b| b < a)
+}
+fn find_ord_one_by<T>(vector: impl AsRef<[T]>, choose_left: impl Fn(T, T) -> bool) -> T
+where
+    T: IsOrd + Copy,
+{
+    let mut curr_choice = None;
     for item in vector.as_ref() {
         let true = item.is_ord() else {
             // continue;
             return *item;
         };
-        let Some(prev_curr_max) = curr_max else {
-            curr_max = Some(item);
+        let Some(prev_choice) = curr_choice else {
+            curr_choice = Some(item);
             continue;
         };
-        if prev_curr_max < item {
-            curr_max = Some(item);
+        if choose_left(*item, *prev_choice) {
+            curr_choice = Some(item);
         }
     }
-    *curr_max.unwrap()
+    *curr_choice.unwrap()
 }
 pub fn sort<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
@@ -253,13 +245,11 @@ mod tests {
         assert_eq!(mul(a, b), &[1, 8, 3, 16]);
         assert_eq!(div(a, b), &[1, 2, 0, 1]);
         assert_eq!(pow(a, cast::<_, u32>(b)), &[1, 16, 1, 256]);
+        #[rustfmt::skip]
         assert_eq!(
             pow(
                 seq(&SeqParams {
-                    start: 1,
-                    end: 10,
-                    step: 1
-                }),
+                    start: 1, end: 10, step: 1 }),
                 cast::<_, u32>(&[1, 2]),
             ),
             &[1, 4, 3, 16, 5, 36, 7, 64, 9, 100]
@@ -269,11 +259,9 @@ mod tests {
 
     #[test]
     fn test_sqrt() {
+        #[rustfmt::skip]
         let x: &[f32] = &seq(&SeqParams {
-            start: 1.,
-            end: 6.,
-            step: 1.,
-        });
+            start: 1., end: 6., step: 1. });
         let sqrt = &sqrt(x);
         #[allow(clippy::approx_constant)]
         let y: &[f32] = &[1., 1.414214, 1.732051, 2., 2.236068, 2.44949];
@@ -286,11 +274,9 @@ mod tests {
 
     #[test]
     fn test_mean() {
+        #[rustfmt::skip]
         let x = &seq(&SeqParams {
-            start: 1,
-            end: 6,
-            step: 1,
-        });
+            start: 1, end: 6, step: 1 });
         let x = &cast::<_, f32>(x);
         let mean = mean(x);
         assert_eq!(mean, 3.5);
