@@ -113,6 +113,12 @@ where
     partial_var
 }
 
+pub fn exp<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Float,
+{
+    vector.as_ref().iter().map(|x| x.exp()).collect()
+}
 pub fn sqrt<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
     T: num_traits::Float,
