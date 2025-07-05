@@ -70,26 +70,6 @@ where
     }
     *curr_max.unwrap()
 }
-pub fn sqrt<T>(vector: impl AsRef<[T]>) -> Vec<T>
-where
-    T: num_traits::Float,
-{
-    let mut out = vec![];
-    for item in vector.as_ref() {
-        out.push(item.sqrt())
-    }
-    out
-}
-pub fn abs<T>(vector: impl AsRef<[T]>) -> Vec<T>
-where
-    T: num_traits::Signed,
-{
-    let mut out = vec![];
-    for item in vector.as_ref() {
-        out.push(item.abs());
-    }
-    out
-}
 pub fn sort<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
     T: IsOrd + Copy + PartialOrd,
@@ -139,6 +119,37 @@ where
         partial_var = partial_var.add(a);
     }
     partial_var
+}
+
+pub fn sqrt<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Float,
+{
+    vector.as_ref().iter().map(|x| x.sqrt()).collect()
+}
+pub fn abs<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Signed,
+{
+    vector.as_ref().iter().map(|x| x.abs()).collect()
+}
+pub fn sin<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Float,
+{
+    vector.as_ref().iter().map(|x| x.sin()).collect()
+}
+pub fn cos<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Float,
+{
+    vector.as_ref().iter().map(|x| x.cos()).collect()
+}
+pub fn tan<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: num_traits::Float,
+{
+    vector.as_ref().iter().map(|x| x.tan()).collect()
 }
 
 pub fn add<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T>
