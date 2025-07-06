@@ -5,6 +5,7 @@ use crate::{
     vector,
 };
 
+/// ref: <https://github.com/wch/r-source/blob/67e3ab91b0489f56520142ce9352d68aa9a49ab0/src/main/array.c#L81>
 pub fn matrix<T>(data: impl AsRef<[T]>, dim: [usize; 2], ordering: FillOrdering) -> MatrixBuf<T>
 where
     T: Copy,
@@ -21,12 +22,14 @@ where
     if !in_divides_out {
         panic!();
     }
+    // ref: <https://github.com/wch/r-source/blob/trunk/src/main/duplicate.c#L446>
     match ordering {
         FillOrdering::RowByRow => {
             let matrix = vector::extend_to_len(data, out_len);
             MatrixBuf { dim, data: matrix }
         }
         FillOrdering::ColByCol => {
+            // ref: <https://github.com/wch/r-source/blob/trunk/src/main/duplicate.h#L61>
             let mut matrix = Vec::with_capacity(out_len);
             matrix.extend(repeat_n(MaybeUninit::uninit(), out_len));
             let mut matrix = MatrixBuf { dim, data: matrix };

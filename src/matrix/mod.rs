@@ -1,8 +1,11 @@
 mod constructor;
+mod ops;
 use std::marker::PhantomData;
 
 pub use constructor::*;
+pub use ops::*;
 
+/// ref: <https://github.com/wch/r-source/blob/67e3ab91b0489f56520142ce9352d68aa9a49ab0/src/main/array.c#L232>
 #[derive(Debug, Clone)]
 pub struct MatrixBuf<T> {
     dim: [usize; 2],

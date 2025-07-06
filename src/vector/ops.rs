@@ -234,6 +234,7 @@ fn wrapping_incr(curr: usize, end: usize) -> usize {
     if new == end { 0 } else { new }
 }
 
+/// ref: <https://github.com/wch/r-source/blob/trunk/src/main/duplicate.c#L375>
 pub(crate) fn extend_to_len<T>(vector: impl AsRef<[T]>, length: usize) -> Vec<T>
 where
     T: Copy,
@@ -251,22 +252,25 @@ where
 }
 
 #[rustfmt::skip]
-pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T>
-where
-T: Copy,
-{
-    vector.as_ref().iter().copied().filter(|x| filter(*x)).collect()
-}
+pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T> where T: Copy {
+    vector.as_ref().iter().copied().filter(|x| filter(*x)).collect() }
 #[rustfmt::skip]
 pub fn which(vector: impl AsRef<[bool]>) -> Vec<usize> {
-    vector.as_ref().iter().enumerate().filter_map(|(i, x)| if *x { Some(i) } else { None }).collect()
-}
+    vector.as_ref().iter().enumerate().filter_map(|(i, x)| if *x { Some(i) } else { None }).collect() }
 
 #[cfg(test)]
 mod tests {
     use crate::vector::{SeqParams, seq};
 
     use super::*;
+
+    #[test]
+    #[should_panic]
+    fn not_aligned() {
+        let a: &[i32] = &[1, 4];
+        let b: &[i32] = &[1, 2, 3];
+        add(a, b);
+    }
 
     #[test]
     fn basics() {
