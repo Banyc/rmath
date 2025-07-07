@@ -124,6 +124,12 @@ mod single_vector_in_single_vector_out {
         vector.as_ref().iter().map(|x| x.is_nan()).collect() }
     pub fn rm_nan<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
         vector.as_ref().iter().copied().filter(|x| !x.is_nan()).collect() }
+    pub fn floor<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
+        vector.as_ref().iter().map(|x| x.floor()).collect() }
+    pub fn ceil<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
+        vector.as_ref().iter().map(|x| x.ceil()).collect() }
+    pub fn round<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
+        vector.as_ref().iter().map(|x| x.round()).collect() }
 }
 pub use two_vectors_in_single_vector_out::*;
 #[rustfmt::skip]
@@ -284,8 +290,7 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             pow(
-                seq(&SeqParams {
-                    start: 1, end: 10, step: 1 }),
+                seq(SeqParams::from(1..=10)),
                 cast::<_, u32>(&[1, 2]),
             ),
             &[1, 4, 3, 16, 5, 36, 7, 64, 9, 100]
@@ -296,8 +301,7 @@ mod tests {
     #[test]
     fn test_sqrt() {
         #[rustfmt::skip]
-        let x: &[f32] = &seq(&SeqParams {
-            start: 1., end: 6., step: 1. });
+        let x: &[f32] = &cast::<_, f32>(&seq(SeqParams::from(1..=6)));
         let sqrt = &sqrt(x);
         #[allow(clippy::approx_constant)]
         let y: &[f32] = &[1., 1.414214, 1.732051, 2., 2.236068, 2.44949];
@@ -311,8 +315,7 @@ mod tests {
     #[test]
     fn test_mean() {
         #[rustfmt::skip]
-        let x = &seq(&SeqParams {
-            start: 1, end: 6, step: 1 });
+        let x = &seq(SeqParams::from(1..=6));
         let x = &cast::<_, f32>(x);
         let mean = mean(x);
         assert_eq!(mean, 3.5);

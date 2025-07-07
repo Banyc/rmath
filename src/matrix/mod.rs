@@ -183,11 +183,7 @@ mod tests {
 
     #[test]
     fn test_submatrix() {
-        let a = vector::seq(&SeqParams {
-            start: 1,
-            end: 6,
-            step: 1,
-        });
+        let a = vector::seq(SeqParams::from(1..=6));
         let mut a = matrix(&a, [3, 2], FillOrdering::RowByRow);
         *entry_mut(&mut a, [2, 0]) = 0;
         println!("{}", MatrixDisplay::new(&a));
@@ -195,7 +191,7 @@ mod tests {
         let b = submatrix(
             &a,
             [
-                SubmatrixAxis::At(seq(&SeqParams { start: 1, end: 2, step: 1 })),
+                SubmatrixAxis::At(seq(SeqParams::from(1..=2))),
                 SubmatrixAxis::All,
             ],
         );

@@ -40,6 +40,12 @@ mod single_vector_in_single_vector_out {
         elem_op1(matrix, |x| vector::is_nan(x)) }
     pub fn rm_nan<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
         elem_op1(matrix, |x| vector::rm_nan(x)) }
+    pub fn floor<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
+        elem_op1(matrix, |x| vector::floor(x)) }
+    pub fn ceil<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
+        elem_op1(matrix, |x| vector::ceil(x)) }
+    pub fn round<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
+        elem_op1(matrix, |x| vector::round(x)) }
 }
 fn elem_op1<A, B>(
     input: impl AsRef<MatrixBuf<A>>,
@@ -199,7 +205,7 @@ mod tests {
     #[rustfmt::skip]
     #[test]
     fn test_t() {
-        let a = matrix(seq(&SeqParams { start: 1, end: 6, step: 1 }), [3, 2], FillOrdering::RowByRow);
+        let a = matrix(seq(SeqParams::from(1..=6)), [3, 2], FillOrdering::RowByRow);
         let b = t(&a);
         assert_eq!(b.dim(), [2, 3]);
         assert_eq!(b.data(), [1, 4, 2, 5, 3, 6]);

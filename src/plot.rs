@@ -35,7 +35,7 @@ mod tests {
     #[ignore]
     fn exponential_limit() {
         #[rustfmt::skip]
-        let x = &seq(&SeqParams {
+        let x = &seq(SeqParams {
             start: 10, end: 200, step: 10 });
         let x = &cast::<_, f64>(x);
         let y = &pow(add([1.], div([1.], x)), x);

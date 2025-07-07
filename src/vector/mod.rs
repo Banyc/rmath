@@ -28,11 +28,7 @@ mod tests {
 
     #[test]
     fn test_set() {
-        let mut a = seq(&SeqParams {
-            start: 1,
-            end: 2,
-            step: 1,
-        });
+        let mut a = seq(SeqParams::from(1..=2));
         #[rustfmt::skip]
         set(&mut a, &SetParams { index: 0, value: 0, filler: 0 });
         assert_eq!(a, [0, 2]);
