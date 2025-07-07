@@ -172,6 +172,10 @@ mod two_vectors_in_single_vector_out {
         circle_zip(a, b, |a, b| a ^ b) }
 }
 
+#[rustfmt::skip]
+pub fn map<A, B>(vector: impl AsRef<[A]>, fmap: impl Fn(A) -> B) -> Vec<B> where A: Copy {
+    vector.as_ref().iter().map(|x| fmap(*x)).collect() }
+
 /// docs: <https://web.mit.edu/r/current/lib/R/library/base/html/all.equal.html>
 /// src: <https://github.com/wch/r-source/blob/67e3ab91b0489f56520142ce9352d68aa9a49ab0/src/library/base/R/all.equal.R#L100>
 #[rustfmt::skip]

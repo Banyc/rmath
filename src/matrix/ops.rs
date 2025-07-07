@@ -110,6 +110,11 @@ fn elem_op2<A, B, C>(
 }
 
 #[rustfmt::skip]
+pub fn map<A, B>(matrix: impl AsRef<MatrixBuf<A>>, fmap: impl Fn(A) -> B) -> MatrixBuf<B> where A: Copy {
+    let matrix = matrix.as_ref();
+    MatrixBuf { dim: matrix.dim(), data: vector::map(matrix.data(), fmap) } }
+
+#[rustfmt::skip]
 pub fn all_eq<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>, params: &vector::AllEqParams<T, impl AsRef<[T]>>) -> bool
 where
     T: num_traits::Float + std::ops::DivAssign + std::ops::AddAssign + std::ops::MulAssign + num_traits::FromPrimitive + num_traits::Signed,
