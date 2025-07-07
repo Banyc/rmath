@@ -35,9 +35,8 @@ where
     vec
 }
 
-pub fn c<Slice2, Slice1, T>(vectors: Slice2) -> Vec<T>
+pub fn c<Slice1, T>(vectors: impl AsRef<[Slice1]>) -> Vec<T>
 where
-    Slice2: AsRef<[Slice1]>,
     Slice1: AsRef<[T]>,
     T: Copy,
 {
