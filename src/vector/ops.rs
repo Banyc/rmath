@@ -13,6 +13,15 @@ where
 }
 
 #[rustfmt::skip]
+pub fn pmin<T, Slice>(vectors: impl AsRef<[Slice]>) -> Vec<T>
+where T: PartialOrd + IsOrd + Copy, Slice: AsRef<[T]> {
+    vectors.as_ref().iter().map(|vector| min(vector.as_ref())).collect() }
+#[rustfmt::skip]
+pub fn pmax<T, Slice>(vectors: impl AsRef<[Slice]>) -> Vec<T>
+where T: PartialOrd + IsOrd + Copy, Slice: AsRef<[T]> {
+    vectors.as_ref().iter().map(|vector| max(vector.as_ref())).collect() }
+
+#[rustfmt::skip]
 pub fn sum<T>(vector: impl AsRef<[T]>) -> T where T: Copy + AddAssign + Zero {
     vector.as_ref().iter().fold(T::zero(), |mut cum, a| {
         cum += *a; cum }) }
