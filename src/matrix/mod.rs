@@ -83,7 +83,7 @@ pub enum SubmatrixAxis<Vec> {
 }
 enum SubmatrixAxisIter<'a> {
     All { range: std::ops::Range<usize> },
-    At { i: usize, vec: &'a [usize] },
+    At { i: std::slice::Iter<'a, usize> },
 }
 impl<'a> SubmatrixAxisIter<'a> {
     pub fn new(
@@ -93,8 +93,7 @@ impl<'a> SubmatrixAxisIter<'a> {
         match axis {
             SubmatrixAxis::All => Self::All { range: all_range },
             SubmatrixAxis::At(vec) => Self::At {
-                i: 0,
-                vec: vec.as_ref(),
+                i: vec.as_ref().iter(),
             },
         }
     }
@@ -104,20 +103,13 @@ impl Iterator for SubmatrixAxisIter<'_> {
     fn next(&mut self) -> Option<Self::Item> {
         match self {
             SubmatrixAxisIter::All { range } => range.next(),
-            SubmatrixAxisIter::At { i, vec } => {
-                let a = *vec.get(*i)?;
-                *i += 1;
-                Some(a)
-            }
+            SubmatrixAxisIter::At { i } => i.next().copied(),
         }
     }
     fn size_hint(&self) -> (usize, Option<usize>) {
         match self {
             SubmatrixAxisIter::All { range } => range.size_hint(),
-            SubmatrixAxisIter::At { i, vec } => {
-                let len = vec.len() - *i;
-                (len, Some(len))
-            }
+            SubmatrixAxisIter::At { i } => i.size_hint(),
         }
     }
 }
