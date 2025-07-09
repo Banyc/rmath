@@ -115,6 +115,7 @@ pub fn all(vector: impl AsRef<[bool]>) -> bool {
 pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
+    use crate::property::CalcFactorial;
     pub fn neg<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: std::ops::Neg<Output = T> + Copy {
         vector.as_ref().iter().map(|x| x.neg()).collect() }
     pub fn not(vector: impl AsRef<[bool]>) -> Vec<bool> {
@@ -141,10 +142,13 @@ mod single_vector_in_single_vector_out {
         vector.as_ref().iter().map(|x| x.ceil()).collect() }
     pub fn round<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
         vector.as_ref().iter().map(|x| x.round()).collect() }
+    pub fn factorial<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: CalcFactorial {
+        vector.as_ref().iter().map(|x| x.factorial()).collect() }
 }
 pub use two_vectors_in_single_vector_out::*;
 #[rustfmt::skip]
 mod two_vectors_in_single_vector_out {
+    use crate::property::CalcChoose;
     use super::*;
     pub fn add<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + AddAssign {
         circle_zip(a, b, |mut a, b| { a += b; a }) }
@@ -172,6 +176,8 @@ mod two_vectors_in_single_vector_out {
         circle_zip(a, b, |a, b| a && b) }
     pub fn xor(a: impl AsRef<[bool]>, b: impl AsRef<[bool]>) -> Vec<bool> {
         circle_zip(a, b, |a, b| a ^ b) }
+    pub fn choose<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: CalcChoose + Copy {
+        circle_zip(a, b, |a, b| a.choose(b)) }
 }
 
 #[rustfmt::skip]

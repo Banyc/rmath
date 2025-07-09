@@ -21,6 +21,7 @@ where
 pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
+    use crate::property::CalcFactorial;
     use super::*;
     pub fn neg<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: std::ops::Neg<Output = T> + Copy {
         elem_op1(matrix, |x| vector::neg(x)) }
@@ -48,6 +49,8 @@ mod single_vector_in_single_vector_out {
         elem_op1(matrix, |x| vector::ceil(x)) }
     pub fn round<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
         elem_op1(matrix, |x| vector::round(x)) }
+    pub fn factorial<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: CalcFactorial {
+        elem_op1(matrix, |x| vector::factorial(x)) }
 }
 fn elem_op1<A, B>(
     input: impl AsRef<MatrixBuf<A>>,
@@ -64,6 +67,7 @@ fn elem_op1<A, B>(
 pub use two_vectors_in_single_vector_out::*;
 #[rustfmt::skip]
 mod two_vectors_in_single_vector_out {
+    use crate::property::CalcChoose;
     use super::*;
     pub fn add<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + std::ops::AddAssign {
         elem_op2(a, b, |a, b| vector::add(a, b)) }
@@ -91,6 +95,8 @@ mod two_vectors_in_single_vector_out {
         elem_op2(a, b, |a, b| vector::and(a, b)) }
     pub fn xor(a: impl AsRef<MatrixBuf<bool>>, b: impl AsRef<MatrixBuf<bool>>) -> MatrixBuf<bool> {
         elem_op2(a, b, |a, b| vector::xor(a, b)) }
+    pub fn choose<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: CalcChoose + Copy {
+        elem_op2(a, b, |a, b| vector::choose(a, b)) }
 }
 fn elem_op2<A, B, C>(
     a: impl AsRef<MatrixBuf<A>>,

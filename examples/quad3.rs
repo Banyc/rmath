@@ -24,7 +24,7 @@ pub struct QuadConsts {
     pub b: f64,
     pub c: f64,
 }
-fn quad3(c: &QuadConsts) -> impl Fn(f64) -> f64 {
+fn quad3(c: &QuadConsts) -> impl Fn(f64) -> f64 + Copy {
     move |x| c.a * x.powi(2) + c.b * x + c.c
 }
 fn quad3_root(c: &QuadConsts) -> Vec<f64> {
