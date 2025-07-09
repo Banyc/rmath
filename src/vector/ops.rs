@@ -115,6 +115,8 @@ pub fn all(vector: impl AsRef<[bool]>) -> bool {
 pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
+    pub fn neg<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: std::ops::Neg<Output = T> + Copy {
+        vector.as_ref().iter().map(|x| x.neg()).collect() }
     pub fn not(vector: impl AsRef<[bool]>) -> Vec<bool> {
         vector.as_ref().iter().map(|x| !x).collect() }
     pub fn exp<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {

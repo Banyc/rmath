@@ -22,6 +22,8 @@ pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
     use super::*;
+    pub fn neg<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: std::ops::Neg<Output = T> + Copy {
+        elem_op1(matrix, |x| vector::neg(x)) }
     pub fn not(matrix: impl AsRef<MatrixBuf<bool>>) -> MatrixBuf<bool> {
         elem_op1(matrix, |x| vector::not(x)) }
     pub fn exp<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: num_traits::Float {
