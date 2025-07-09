@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-nalgebra = "0.33.2"
-num-traits = "0.2.19"
-plotly = "0.12.1"
-serde = "1.0.219"
+nalgebra = "0.33"
+num-traits = "0.2"
+plotly = "0.13"
+serde = "1"
+statrs = "0.18"
