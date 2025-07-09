@@ -34,5 +34,5 @@ fn pension(params: &PensionParams) {
     let time = vector::mul(
         vector::cast::<_, f64>(seq(SeqParams::from(0..=n))),
         [params.period]);
-    plot(time, pension, PlotType::Point);
+    plot(time, pension, PlotType::Point, None);
 }
