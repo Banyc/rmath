@@ -112,6 +112,19 @@ pub fn all(vector: impl AsRef<[bool]>) -> bool {
     vector.as_ref().iter().all(|x| *x)
 }
 
+pub fn cumsum<T>(vector: impl AsRef<[T]>) -> Vec<T>
+where
+    T: std::ops::AddAssign + num_traits::Zero + Copy,
+{
+    let mut out = vec![];
+    let mut sum = T::zero();
+    for item in vector.as_ref() {
+        sum += *item;
+        out.push(sum);
+    }
+    out
+}
+
 pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
@@ -381,5 +394,10 @@ mod tests {
         #[rustfmt::skip]
         assert!(all_eq(about2, [2.], &AllEqParams {
             tolerance: 10e-7, scale: all_eq_no_scale() }));
+    }
+
+    #[test]
+    fn test_cumsum() {
+        assert_eq!(cumsum([1, 2, 3, 4, 5]), [1, 3, 6, 10, 15]);
     }
 }
