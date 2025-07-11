@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     ops::{AddAssign, DivAssign, MulAssign, SubAssign},
 };
 
@@ -301,6 +301,12 @@ pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T> 
 pub fn which(vector: impl AsRef<[bool]>) -> Vec<usize> {
     vector.as_ref().iter().enumerate().filter_map(|(i, x)| if *x { Some(i) } else { None }).collect() }
 
+pub fn levels<T>(vector: impl AsRef<[T]>) -> HashSet<T>
+where
+    T: std::hash::Hash + Eq + Clone,
+{
+    HashSet::from_iter(vector.as_ref().iter().cloned())
+}
 pub fn table<Slice, T>(vectors: impl AsRef<[Slice]>) -> HashMap<Vec<T>, usize>
 where
     Slice: AsRef<[T]>,
@@ -316,6 +322,30 @@ where
         }
         let count = out.entry(key).or_insert(0);
         *count += 1;
+    }
+    out
+}
+pub fn tapply<T, K, V>(
+    x: impl AsRef<[T]>,
+    index: impl AsRef<[K]>,
+    f: impl Fn(&[T]) -> V,
+) -> HashMap<K, V>
+where
+    T: Clone,
+    K: Clone + std::hash::Hash + Eq,
+{
+    let x = x.as_ref();
+    let index = index.as_ref();
+    assert_eq!(x.len(), index.len());
+    let mut groups = HashMap::new();
+    for (index, x) in index.iter().zip(x) {
+        let vector: &mut Vec<T> = groups.entry(index.clone()).or_insert(vec![]);
+        vector.push(x.clone());
+    }
+    let mut out = HashMap::new();
+    for (index, vector) in &groups {
+        let v = f(vector);
+        out.insert(index.clone(), v);
     }
     out
 }
