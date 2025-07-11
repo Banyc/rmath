@@ -1,4 +1,7 @@
-use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use std::{
+    collections::HashMap,
+    ops::{AddAssign, DivAssign, MulAssign, SubAssign},
+};
 
 use num_traits::{One, Pow, Zero};
 
@@ -297,6 +300,25 @@ pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T> 
 #[rustfmt::skip]
 pub fn which(vector: impl AsRef<[bool]>) -> Vec<usize> {
     vector.as_ref().iter().enumerate().filter_map(|(i, x)| if *x { Some(i) } else { None }).collect() }
+
+pub fn table<Slice, T>(vectors: impl AsRef<[Slice]>) -> HashMap<Vec<T>, usize>
+where
+    Slice: AsRef<[T]>,
+    T: Eq + std::hash::Hash + Clone,
+{
+    let mut out = HashMap::new();
+    for i in 0.. {
+        let mut key = vec![];
+        for vector in vectors.as_ref() {
+            let vector = vector.as_ref();
+            let k = vector[i].clone();
+            key.push(k);
+        }
+        let count = out.entry(key).or_insert(0);
+        *count += 1;
+    }
+    out
+}
 
 #[cfg(test)]
 mod tests {
