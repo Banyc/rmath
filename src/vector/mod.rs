@@ -9,7 +9,7 @@ pub fn set<T>(
     src: impl AsRef<[T]>,
     fill: impl Fn() -> T,
 ) where
-    T: Copy,
+    T: Clone,
 {
     let start = match index.start_bound() {
         std::ops::Bound::Included(x) => *x,
@@ -30,14 +30,14 @@ pub fn set<T>(
         let mut pos = 0;
         while pos < total_copy_len {
             let copy_len = (total_copy_len - pos).min(src.len());
-            dst[start + pos..start + pos + copy_len].copy_from_slice(&src[..copy_len]);
+            dst[start + pos..start + pos + copy_len].clone_from_slice(&src[..copy_len]);
             pos += copy_len;
         }
         return;
     }
     let fill_count = end - dst.len();
     dst.extend(std::iter::repeat_n(fill(), fill_count));
-    dst[start..end].copy_from_slice(src);
+    dst[start..end].clone_from_slice(src);
 }
 
 #[cfg(test)]

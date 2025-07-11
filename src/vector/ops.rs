@@ -9,7 +9,7 @@ use crate::property::IsOrd;
 
 pub fn cast<A, B>(a: impl AsRef<[A]>) -> Vec<B>
 where
-    A: Copy + num_traits::AsPrimitive<B>,
+    A: num_traits::AsPrimitive<B>,
     B: Copy + 'static,
 {
     a.as_ref().iter().map(|a| (*a).as_()).collect()
@@ -17,50 +17,50 @@ where
 
 #[rustfmt::skip]
 pub fn pmin<T, Slice>(vectors: impl AsRef<[Slice]>) -> Vec<T>
-where T: PartialOrd + IsOrd + Copy, Slice: AsRef<[T]> {
+where T: PartialOrd + IsOrd + Clone, Slice: AsRef<[T]> {
     vectors.as_ref().iter().map(|vector| min(vector.as_ref())).collect() }
 #[rustfmt::skip]
 pub fn pmax<T, Slice>(vectors: impl AsRef<[Slice]>) -> Vec<T>
-where T: PartialOrd + IsOrd + Copy, Slice: AsRef<[T]> {
+where T: PartialOrd + IsOrd + Clone, Slice: AsRef<[T]> {
     vectors.as_ref().iter().map(|vector| max(vector.as_ref())).collect() }
 
 #[rustfmt::skip]
-pub fn sum<T>(vector: impl AsRef<[T]>) -> T where T: Copy + AddAssign + Zero {
+pub fn sum<T>(vector: impl AsRef<[T]>) -> T where T: Clone + AddAssign + Zero {
     vector.as_ref().iter().fold(T::zero(), |mut cum, a| {
-        cum += *a; cum }) }
+        cum += a.clone(); cum }) }
 #[rustfmt::skip]
-pub fn prod<T>(vector: impl AsRef<[T]>) -> T where T: Copy + MulAssign + One {
+pub fn prod<T>(vector: impl AsRef<[T]>) -> T where T: Clone + MulAssign + One {
     vector.as_ref().iter().fold(T::one(), |mut cum, a| {
-        cum *= *a; cum }) }
+        cum *= a.clone(); cum }) }
 #[rustfmt::skip]
-pub fn min<T>(vector: impl AsRef<[T]>) -> T where T: PartialOrd + IsOrd + Copy {
+pub fn min<T>(vector: impl AsRef<[T]>) -> T where T: PartialOrd + IsOrd + Clone {
     find_ord_one_by(vector, |a, b| a < b) }
 #[rustfmt::skip]
-pub fn max<T>(vector: impl AsRef<[T]>) -> T where T: PartialOrd + IsOrd + Copy {
+pub fn max<T>(vector: impl AsRef<[T]>) -> T where T: PartialOrd + IsOrd + Clone {
     find_ord_one_by(vector, |a, b| b < a) }
 fn find_ord_one_by<T>(vector: impl AsRef<[T]>, choose_left: impl Fn(T, T) -> bool) -> T
 where
-    T: IsOrd + Copy,
+    T: IsOrd + Clone,
 {
     let mut curr_choice = None;
     for item in vector.as_ref() {
         let true = item.is_ord() else {
             // continue;
-            return *item;
+            return item.clone();
         };
         let Some(prev_choice) = curr_choice else {
             curr_choice = Some(item);
             continue;
         };
-        if choose_left(*item, *prev_choice) {
+        if choose_left(item.clone(), prev_choice.clone()) {
             curr_choice = Some(item);
         }
     }
-    *curr_choice.unwrap()
+    curr_choice.unwrap().clone()
 }
 pub fn sort<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
-    T: IsOrd + Copy + PartialOrd,
+    T: IsOrd + Clone + PartialOrd,
 {
     let vector = vector.as_ref();
     let mut out = vec![];
@@ -69,7 +69,7 @@ where
     } else {
         for item in vector {
             if item.is_ord() {
-                out.push(*item);
+                out.push(item.clone());
             }
         }
     }
@@ -117,13 +117,13 @@ pub fn all(vector: impl AsRef<[bool]>) -> bool {
 
 pub fn cumsum<T>(vector: impl AsRef<[T]>) -> Vec<T>
 where
-    T: std::ops::AddAssign + num_traits::Zero + Copy,
+    T: std::ops::AddAssign + num_traits::Zero + Clone,
 {
     let mut out = vec![];
     let mut sum = T::zero();
     for item in vector.as_ref() {
-        sum += *item;
-        out.push(sum);
+        sum += item.clone();
+        out.push(sum.clone());
     }
     out
 }
@@ -132,8 +132,8 @@ pub use single_vector_in_single_vector_out::*;
 #[rustfmt::skip]
 mod single_vector_in_single_vector_out {
     use crate::property::CalcFactorial;
-    pub fn neg<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: std::ops::Neg<Output = T> + Copy {
-        vector.as_ref().iter().map(|x| x.neg()).collect() }
+    pub fn neg<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: std::ops::Neg<Output = T> + Clone {
+        vector.as_ref().iter().map(|x| x.clone().neg()).collect() }
     pub fn not(vector: impl AsRef<[bool]>) -> Vec<bool> {
         vector.as_ref().iter().map(|x| !x).collect() }
     pub fn exp<T>(vector: impl AsRef<[T]>) -> Vec<T> where T: num_traits::Float {
@@ -166,25 +166,25 @@ pub use two_vectors_in_single_vector_out::*;
 mod two_vectors_in_single_vector_out {
     use crate::property::CalcChoose;
     use super::*;
-    pub fn add<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + AddAssign {
+    pub fn add<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Clone + AddAssign {
         circle_zip(a, b, |mut a, b| { a += b; a }) }
-    pub fn sub<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + SubAssign {
+    pub fn sub<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Clone + SubAssign {
         circle_zip(a, b, |mut a, b| { a -= b; a }) }
-    pub fn mul<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + MulAssign {
+    pub fn mul<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Clone + MulAssign {
         circle_zip(a, b, |mut a, b| { a *= b; a }) }
-    pub fn div<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + DivAssign {
+    pub fn div<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Clone + DivAssign {
         circle_zip(a, b, |mut a, b| { a /= b; a }) }
-    pub fn modulo<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Copy + num_traits::PrimInt {
+    pub fn modulo<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: Clone + num_traits::PrimInt {
         circle_zip(a, b, |a, b| a % b) }
-    pub fn pow<A, B>(a: impl AsRef<[A]>, b: impl AsRef<[B]>) -> Vec<A> where A: Copy + Pow<B, Output = A>, B: Copy {
+    pub fn pow<A, B>(a: impl AsRef<[A]>, b: impl AsRef<[B]>) -> Vec<A> where A: Clone + Pow<B, Output = A>, B: Clone {
         circle_zip(a, b, |a, b| a.pow(b)) }
-    pub fn lt<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialOrd + Copy {
+    pub fn lt<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialOrd + Clone {
         circle_zip(a, b, |a, b| a < b) }
-    pub fn gt<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialOrd + Copy {
+    pub fn gt<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialOrd + Clone {
         circle_zip(a, b, |a, b| a > b) }
-    pub fn eq<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialEq + Copy {
+    pub fn eq<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialEq + Clone {
         circle_zip(a, b, |a, b| a == b) }
-    pub fn neq<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialEq + Copy {
+    pub fn neq<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<bool> where T: PartialEq + Clone {
         circle_zip(a, b, |a, b| a != b) }
     pub fn or(a: impl AsRef<[bool]>, b: impl AsRef<[bool]>) -> Vec<bool> {
         circle_zip(a, b, |a, b| a || b) }
@@ -192,13 +192,13 @@ mod two_vectors_in_single_vector_out {
         circle_zip(a, b, |a, b| a && b) }
     pub fn xor(a: impl AsRef<[bool]>, b: impl AsRef<[bool]>) -> Vec<bool> {
         circle_zip(a, b, |a, b| a ^ b) }
-    pub fn choose<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: CalcChoose + Copy {
+    pub fn choose<T>(a: impl AsRef<[T]>, b: impl AsRef<[T]>) -> Vec<T> where T: CalcChoose + Clone {
         circle_zip(a, b, |a, b| a.choose(b)) }
 }
 
 #[rustfmt::skip]
-pub fn map<A, B>(vector: impl AsRef<[A]>, fmap: impl Fn(A) -> B) -> Vec<B> where A: Copy {
-    vector.as_ref().iter().map(|x| fmap(*x)).collect() }
+pub fn map<A, B>(vector: impl AsRef<[A]>, fmap: impl Fn(A) -> B) -> Vec<B> where A: Clone {
+    vector.as_ref().iter().map(|x| fmap(x.clone())).collect() }
 
 /// docs: <https://web.mit.edu/r/current/lib/R/library/base/html/all.equal.html>
 /// src: <https://github.com/wch/r-source/blob/67e3ab91b0489f56520142ce9352d68aa9a49ab0/src/library/base/R/all.equal.R#L100>
@@ -241,8 +241,8 @@ fn circle_zip<A, B, C>(
     reduce_one: impl Fn(A, B) -> C,
 ) -> Vec<C>
 where
-    A: Copy,
-    B: Copy,
+    A: Clone,
+    B: Clone,
 {
     let a = a.as_ref();
     let b = b.as_ref();
@@ -265,7 +265,7 @@ where
             break;
         }
         loop_once = true;
-        let c = reduce_one(a[a_i], b[b_i]);
+        let c = reduce_one(a[a_i].clone(), b[b_i].clone());
         out.push(c);
         a_i = wrapping_incr(a_i, a.len());
         b_i = wrapping_incr(b_i, b.len());
@@ -280,7 +280,7 @@ fn wrapping_incr(curr: usize, end: usize) -> usize {
 /// ref: <https://github.com/wch/r-source/blob/trunk/src/main/duplicate.c#L375>
 pub(crate) fn extend_to_len<T>(vector: impl AsRef<[T]>, length: usize) -> Vec<T>
 where
-    T: Copy,
+    T: Clone,
 {
     let vector = vector.as_ref();
     let in_divides_out = length.is_multiple_of(vector.len());
@@ -289,14 +289,14 @@ where
     }
     let mut out = Vec::with_capacity(length);
     while out.len() != length {
-        out.extend(vector);
+        out.extend(vector.iter().cloned());
     }
     out
 }
 
 #[rustfmt::skip]
-pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T> where T: Copy {
-    vector.as_ref().iter().copied().filter(|x| filter(*x)).collect() }
+pub fn subset<T>(vector: impl AsRef<[T]>, filter: impl Fn(T) -> bool) -> Vec<T> where T: Clone {
+    vector.as_ref().iter().filter(|&x| filter(x.clone())).cloned().collect() }
 #[rustfmt::skip]
 pub fn which(vector: impl AsRef<[bool]>) -> Vec<usize> {
     vector.as_ref().iter().enumerate().filter_map(|(i, x)| if *x { Some(i) } else { None }).collect() }

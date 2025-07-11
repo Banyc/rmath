@@ -8,14 +8,14 @@ pub struct SeqParams<T> {
 }
 pub fn seq<T>(params: impl AsRef<SeqParams<T>>) -> Vec<T>
 where
-    T: Copy + PartialOrd + AddAssign,
+    T: Clone + PartialOrd + AddAssign,
 {
     let params = params.as_ref();
     let mut vec = vec![];
-    let mut curr = params.start;
+    let mut curr = params.start.clone();
     while curr <= params.end {
-        vec.push(curr);
-        curr += params.step;
+        vec.push(curr.clone());
+        curr += params.step.clone();
     }
     vec
 }
@@ -45,10 +45,14 @@ pub struct RepParams<T> {
 }
 pub fn rep<T>(params: impl AsRef<RepParams<T>>) -> Vec<T>
 where
-    T: Copy,
+    T: Clone,
 {
     let params = params.as_ref();
-    vec![params.value; params.times]
+    let mut out = vec![];
+    for _ in 0..params.times {
+        out.push(params.value.clone());
+    }
+    out
 }
 #[rustfmt::skip]
 impl<T> AsRef<RepParams<T>> for RepParams<T> { fn as_ref(&self) -> &RepParams<T> { self } }
@@ -56,11 +60,11 @@ impl<T> AsRef<RepParams<T>> for RepParams<T> { fn as_ref(&self) -> &RepParams<T>
 pub fn c<Slice1, T>(vectors: impl AsRef<[Slice1]>) -> Vec<T>
 where
     Slice1: AsRef<[T]>,
-    T: Copy,
+    T: Clone,
 {
     let mut vec = vec![];
     for vector in vectors.as_ref() {
-        vec.extend(vector.as_ref());
+        vec.extend(vector.as_ref().iter().cloned());
     }
     vec
 }

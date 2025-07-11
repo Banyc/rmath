@@ -7,7 +7,7 @@ use crate::{
 
 pub fn cast<A, B>(input: impl AsRef<MatrixBuf<A>>) -> MatrixBuf<B>
 where
-    A: Copy + num_traits::AsPrimitive<B>,
+    A: num_traits::AsPrimitive<B>,
     B: Copy + 'static,
 {
     let input = input.as_ref();
@@ -23,7 +23,7 @@ pub use single_vector_in_single_vector_out::*;
 mod single_vector_in_single_vector_out {
     use crate::property::CalcFactorial;
     use super::*;
-    pub fn neg<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: std::ops::Neg<Output = T> + Copy {
+    pub fn neg<T>(matrix: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: std::ops::Neg<Output = T> + Clone {
         elem_op1(matrix, |x| vector::neg(x)) }
     pub fn not(matrix: impl AsRef<MatrixBuf<bool>>) -> MatrixBuf<bool> {
         elem_op1(matrix, |x| vector::not(x)) }
@@ -69,25 +69,25 @@ pub use two_vectors_in_single_vector_out::*;
 mod two_vectors_in_single_vector_out {
     use crate::property::CalcChoose;
     use super::*;
-    pub fn add<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + std::ops::AddAssign {
+    pub fn add<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Clone + std::ops::AddAssign {
         elem_op2(a, b, |a, b| vector::add(a, b)) }
-    pub fn sub<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + std::ops::SubAssign {
+    pub fn sub<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Clone + std::ops::SubAssign {
         elem_op2(a, b, |a, b| vector::sub(a, b)) }
-    pub fn mul<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + std::ops::MulAssign {
+    pub fn mul<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Clone + std::ops::MulAssign {
         elem_op2(a, b, |a, b| vector::mul(a, b)) }
-    pub fn div<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + std::ops::DivAssign {
+    pub fn div<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Clone + std::ops::DivAssign {
         elem_op2(a, b, |a, b| vector::div(a, b)) }
-    pub fn modulo<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Copy + num_traits::PrimInt {
+    pub fn modulo<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: Clone + num_traits::PrimInt {
         elem_op2(a, b, |a, b| vector::modulo(a, b)) }
-    pub fn pow<A, B>(a: impl AsRef<MatrixBuf<A>>, b: impl AsRef<MatrixBuf<B>>) -> MatrixBuf<A> where A: Copy + num_traits::Pow<B, Output = A>, B: Copy {
+    pub fn pow<A, B>(a: impl AsRef<MatrixBuf<A>>, b: impl AsRef<MatrixBuf<B>>) -> MatrixBuf<A> where A: Clone + num_traits::Pow<B, Output = A>, B: Clone {
         elem_op2(a, b, |a, b| vector::pow(a, b)) }
-    pub fn lt<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialOrd + Copy {
+    pub fn lt<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialOrd + Clone {
         elem_op2(a, b, |a, b| vector::lt(a, b)) }
-    pub fn gt<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialOrd + Copy {
+    pub fn gt<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialOrd + Clone {
         elem_op2(a, b, |a, b| vector::gt(a, b)) }
-    pub fn eq<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialEq + Copy {
+    pub fn eq<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialEq + Clone {
         elem_op2(a, b, |a, b| vector::eq(a, b)) }
-    pub fn neq<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialEq + Copy {
+    pub fn neq<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<bool> where T: PartialEq + Clone {
         elem_op2(a, b, |a, b| vector::neq(a, b)) }
     pub fn or(a: impl AsRef<MatrixBuf<bool>>, b: impl AsRef<MatrixBuf<bool>>) -> MatrixBuf<bool> {
         elem_op2(a, b, |a, b| vector::or(a, b)) }
@@ -95,7 +95,7 @@ mod two_vectors_in_single_vector_out {
         elem_op2(a, b, |a, b| vector::and(a, b)) }
     pub fn xor(a: impl AsRef<MatrixBuf<bool>>, b: impl AsRef<MatrixBuf<bool>>) -> MatrixBuf<bool> {
         elem_op2(a, b, |a, b| vector::xor(a, b)) }
-    pub fn choose<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: CalcChoose + Copy {
+    pub fn choose<T>(a: impl AsRef<MatrixBuf<T>>, b: impl AsRef<MatrixBuf<T>>) -> MatrixBuf<T> where T: CalcChoose + Clone {
         elem_op2(a, b, |a, b| vector::choose(a, b)) }
 }
 fn elem_op2<A, B, C>(
@@ -118,7 +118,7 @@ fn elem_op2<A, B, C>(
 }
 
 #[rustfmt::skip]
-pub fn map<A, B>(matrix: impl AsRef<MatrixBuf<A>>, fmap: impl Fn(A) -> B) -> MatrixBuf<B> where A: Copy {
+pub fn map<A, B>(matrix: impl AsRef<MatrixBuf<A>>, fmap: impl Fn(A) -> B) -> MatrixBuf<B> where A: Clone {
     let matrix = matrix.as_ref();
     MatrixBuf { dim: matrix.dim(), data: vector::map(matrix.data(), fmap) } }
 
