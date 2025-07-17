@@ -17,11 +17,12 @@ pub struct FixedPointParams {
     pub tolerance: f64,
     pub max_iters: usize,
 }
+#[rustfmt::skip]
 pub fn fixed_point(f: impl Fn(f64) -> f64, params: &FixedPointParams) -> Option<f64> {
     let mut x = params.start;
     for _ in 0..params.max_iters {
         let y = f(x);
-        if ((x - y) / x).abs() <= params.tolerance {
+        if vector::all_eq([x], [y], &vector::AllEqParams { tolerance: params.tolerance, scale: vector::all_eq_no_scale() }) {
             return Some(y);
         }
         x = y
